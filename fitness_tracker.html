@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Calorie & Intensity Tracker</title>
+<style>
+body{
+font-family:Arial, sans-serif;
+background:#eef2f7;
+margin:0;
+padding:0;
+}
+header{
+background:#2563eb;
+color:white;
+padding:15px;
+text-align:center;
+}
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+margin-bottom:20px;
+}
+input,select,button{
+padding:10px;
+margin:6px 0;
+width:100%;
+border-radius:6px;
+border:1px solid #ccc;
+}
+button{
+background:#22c55e;
+color:white;
+border:none;
+font-weight:bold;
+cursor:pointer;
+}
+button:hover{background:#16a34a}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+th,td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+th{background:#2563eb;color:white}
+
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
+}
+.stat{
+background:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.stat h2{margin:5px 0;color:#2563eb}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Fitness Tracker Dashboard</h1>
+</header>
+
+<div class="container">
+
+<div class="dashboard">
+<div class="stat">
+<p>Total Calories Burned</p>
+<h2 id="totalCalories">0</h2>
+</div>
+<div class="stat">
+<p>Activities Logged</p>
+<h2 id="totalActivities">0</h2>
+</div>
+<div class="stat">
+<p>Your BMI</p>
+<h2 id="bmiResult">-</h2>
+</div>
+</div>
+
+<div class="card">
+<h3>Track Workout</h3>
+<input type="text" id="activity" placeholder="Activity (Running, Walking, Cycling)">
+<input type="number" id="duration" placeholder="Duration (minutes)">
+<select id="intensity">
+<option value="4">Low Intensity</option>
+<option value="7">Moderate Intensity</option>
+<option value="10">High Intensity</option>
+</select>
+<button onclick="addActivity()">Add Activity</button>
+
+<table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>Duration</th>
+<th>Intensity</th>
+<th>Calories</th>
+</tr>
+</thead>
+<tbody id="tableData"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>BMI Calculator</h3>
+<input type="number" id="height" placeholder="Height (cm)">
+<input type="number" id="weight" placeholder="Weight (kg)">
+<button onclick="calculateBMI()">Calculate BMI</button>
+</div>
+
+</div>
+
+<script>
+let activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+function addActivity(){
+
+let activity=document.getElementById("activity").value;
+let duration=document.getElementById("duration").value;
+let intensity=document.getElementById("intensity").value;
+
+if(activity==""||duration==""){
+alert("Enter activity and duration");
+return;
+}
+
+let calories=duration*intensity;
+
+let data={activity,duration,intensity,calories};
+
+activities.push(data);
+localStorage.setItem("activities",JSON.stringify(activities));
+
+renderTable();
+
+}
+
+function renderTable(){
+
+let table=document.getElementById("tableData");
+
+table.innerHTML="";
+
+let totalCalories=0;
+
+activities.forEach(a=>{
+
+let row=`<tr>
+<td>${a.activity}</td>
+<td>${a.duration} min</td>
+<td>${a.intensity}</td>
+<td>${a.calories}</td>
+</tr>`;
+
+ table.innerHTML+=row;
+
+ totalCalories+=Number(a.calories);
+
+});
+
+document.getElementById("totalCalories").innerText=totalCalories;
+document.getElementById("totalActivities").innerText=activities.length;
+}
+
+function calculateBMI(){
+
+let h=document.getElementById("height").value/100;
+let w=document.getElementById("weight").value;
+
+if(!h||!w){alert("Enter height and weight");return}
+
+let bmi=(w/(h*h)).toFixed(1);
+
+document.getElementById("bmiResult").innerText=bmi;
+}
+
+renderTable();
+</script>
+
+</body>
+</html>
